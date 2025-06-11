@@ -1,0 +1,11 @@
+transformers
+sentence-transformers
+langchain
+langchainhub
+langchain-chroma
+langchain_experimental
+langchain-community
+langchain_huggingface
+python-dotenv
+pypdf
+streamlit
