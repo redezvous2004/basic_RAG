@@ -1,8 +1,8 @@
-
+import torch
 import streamlit as st
 from process import process_pdf
 from load_model import load_embeddings, load_llm
-
+from transformers import BitsAndBytesConfig
 # Make sure model are loaded each interaction
 if "rag_chain" not in st.session_state: # Rag chain build from pdf
     st.session_state.rag_chain = None
@@ -25,9 +25,15 @@ st.markdown("""
 """)
 
 if not st.session_state.models_loaded:
+    nf4_config = BitsAndBytesConfig(
+        load_in_4bit=True, # weights is round to 4-bit number
+        bnb_4bit_quant_type="nf4", # A technic for quantizing model to get smaller
+        bnb_4bit_use_double_quant=True, # Double quantize
+        bnb_4bit_compute_dtype=torch.bfloat16 # brain float16
+    )
     st.info("Downloading models...")
     st.session_state.embeddings = load_embeddings("bkai-foundation-models/vietnamese-bi-encoder")
-    st.session_state.llm = load_llm("lmsys/vicuna-7b-v1.5")
+    st.session_state.llm = load_llm("lmsys/vicuna-7b-v1.5", nf4_config)
     st.session_state.models_loaded = True
     st.success("Models loaded successfully!")
     st.rerun()

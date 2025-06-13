@@ -1,11 +1,16 @@
 import tempfile
 import os
+import re
 from langchain.document_loaders import PyPDFLoader
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_chroma import Chroma
 from langchain import hub
+
+def remove_invalid_surrogates(text):
+    return re.sub(r'[\ud800-\udfff]', '', text)
+
 def process_pdf(uploaded_file, session_state):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpf:
         tmpf.write(uploaded_file.getvalue())
@@ -24,6 +29,9 @@ def process_pdf(uploaded_file, session_state):
     )
 
     docs = semanctic_splitter.split_documents(documents=documents)
+
+    for doc in docs:
+        doc.page_content = remove_invalid_surrogates(doc.page_content)
 
     vec_db = Chroma.from_documents(
         documents=docs,

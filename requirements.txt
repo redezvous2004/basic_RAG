@@ -1,5 +1,7 @@
 transformers
 sentence-transformers
+bitsandbytes
+accelerate
 langchain
 langchainhub
 langchain-chroma
@@ -9,3 +11,5 @@ langchain_huggingface
 python-dotenv
 pypdf
 streamlit
+-i https://download.pytorch.org/whl/cpu
+torch >= 1.13.1+cpu
